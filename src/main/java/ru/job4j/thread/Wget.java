@@ -6,42 +6,56 @@ import java.io.IOException;
 import java.net.URL;
 
 public class Wget implements Runnable {
+
+    private static final int SECOND = 1000;
     private final String url;
     private final int speed;
+    private final String fileName;
 
-    public Wget(String url, int speed) {
+    public Wget(String url, int speed, String fileName) {
         this.url = url;
         this.speed = speed;
+        this.fileName = fileName;
     }
 
     @Override
     public void run() {
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream("pom_tmp.xml")) {
+             FileOutputStream fileOutputStream = new FileOutputStream(fileName)) {
             byte[] dataBuffer = new byte[1024];
             int bytesRead;
             int count = 1;
             long now = System.currentTimeMillis();
+            int downloadData = 0;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
-                long leadTime = System.currentTimeMillis() - now;
-                System.out.println("\r downloading time = " + (speed - leadTime) + " count = " + count);
-                if (leadTime < speed) {
-                    Thread.sleep(speed - leadTime);
+                downloadData += bytesRead;
+                System.out.print("\r downloading Data = " + downloadData);
+                if (downloadData >= speed) {
+                    long leadTime = System.currentTimeMillis() - now;
+                    System.out.println("\r downloading time = " + (leadTime) + " count = " + count);
+                    if (leadTime < SECOND) {
+                        try {
+                            Thread.sleep(SECOND - leadTime);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
                     now = System.currentTimeMillis();
+                    downloadData = 0;
                 }
                 count++;
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            Thread.currentThread().interrupt();
         }
     }
 
     public static void checkValidateArgs(String[] args) {
-        if (args.length < 2) {
+        if (args.length < 3) {
             System.out.println("Check the correctness of the arguments."
-                    + "\nEnter 2 parameters: url, speed to save");
+                    + System.lineSeparator()
+                    + "Enter 3 parameters: url, speed and fileName to save");
         }
     }
 
@@ -50,11 +64,12 @@ public class Wget implements Runnable {
         checkValidateArgs(args);
         String url = args[0];
         int speed = Integer.parseInt(args[1]);
-        Thread wget = new Thread(new Wget(url, speed));
-        long now = System.currentTimeMillis();
+        String fileName = args[2];
+        Thread wget = new Thread(new Wget(url, speed, fileName));
+        long start = System.currentTimeMillis();
         wget.start();
         wget.join();
         System.out.println();
-        System.out.println(System.currentTimeMillis() - now);
+        System.out.println(System.currentTimeMillis() - start);
     }
 }
