@@ -1,22 +1,17 @@
 package ru.job4j.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
-public class SaveContent {
+public final class SaveContent {
 
-    private final String content;
     private final File file;
 
     public SaveContent(String content, File file) {
-        this.content = content;
         this.file = file;
     }
 
-    public void saveContent() throws IOException {
-        try (OutputStream o = new FileOutputStream(file)) {
+    public void saveContent(String content) throws IOException {
+        try (BufferedOutputStream o = new BufferedOutputStream(new FileOutputStream(file))) {
             for (int i = 0; i < content.length(); i++) {
                 o.write(content.charAt(i));
             }
