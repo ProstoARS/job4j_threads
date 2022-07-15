@@ -20,7 +20,7 @@ public class AccountStorage {
 
     public boolean update(Account account) {
         synchronized (accounts) {
-            return accounts.replace(account.getId(), account) == null;
+            return accounts.replace(account.getId(), account) != null;
         }
     }
 
