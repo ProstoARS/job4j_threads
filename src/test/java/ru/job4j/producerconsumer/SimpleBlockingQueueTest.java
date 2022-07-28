@@ -11,27 +11,40 @@ import static org.assertj.core.api.Assertions.*;
 class SimpleBlockingQueueTest {
 
     @Test
-    public void whenOffer() throws InterruptedException {
-        SimpleBlockingQueue<Integer> sbq = new SimpleBlockingQueue<>();
+    public void whenOffer() {
+        SimpleBlockingQueue<Integer> sbq = new SimpleBlockingQueue<>(2);
         List<Integer> list = new ArrayList<>();
         Thread producer = new Thread(
                 () -> {
-                    sbq.offer(5);
-                    sbq.offer(2);
-                    sbq.offer(4);
+                    try {
+                        sbq.offer(5);
+                        sbq.offer(2);
+                        sbq.offer(4);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
         );
         Thread consumer = new Thread(
                 () -> {
-                    list.add(sbq.poll());
-                    list.add(sbq.poll());
-                    list.add(sbq.poll());
+                    try {
+                        list.add(sbq.poll());
+                        list.add(sbq.poll());
+                        list.add(sbq.poll());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                    }
                 }
         );
         producer.start();
         consumer.start();
-        producer.join();
-        consumer.join();
+        try {
+            producer.join();
+            consumer.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         assertThat(list).isEqualTo(List.of(5, 2, 4));
     }
 }
