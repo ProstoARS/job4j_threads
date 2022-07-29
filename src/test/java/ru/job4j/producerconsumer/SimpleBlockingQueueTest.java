@@ -1,39 +1,38 @@
 package ru.job4j.producerconsumer;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 
-class SimpleBlockingQueueTest {
+public class SimpleBlockingQueueTest {
 
     @Test
-    public void whenOffer() {
+    public void whenFetchAllThenGetIt() {
         SimpleBlockingQueue<Integer> sbq = new SimpleBlockingQueue<>(2);
-        List<Integer> list = new ArrayList<>();
+        final CopyOnWriteArrayList<Integer> buffer = new CopyOnWriteArrayList<>();
         Thread producer = new Thread(
-                () -> {
+                () -> IntStream.range(0, 5).forEach(a -> {
                     try {
-                        sbq.offer(5);
-                        sbq.offer(2);
-                        sbq.offer(4);
+                        sbq.offer(a);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
+                })
         );
         Thread consumer = new Thread(
                 () -> {
-                    try {
-                        list.add(sbq.poll());
-                        list.add(sbq.poll());
-                        list.add(sbq.poll());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        Thread.currentThread().interrupt();
+                    while (!sbq.isEmpty() || !Thread.currentThread().isInterrupted()) {
+                        try {
+                            buffer.add(sbq.poll());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            Thread.currentThread().interrupt();
+                        }
                     }
                 }
         );
@@ -41,10 +40,11 @@ class SimpleBlockingQueueTest {
         consumer.start();
         try {
             producer.join();
+            consumer.interrupt();
             consumer.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        assertThat(list).isEqualTo(List.of(5, 2, 4));
+        assertThat(buffer, is(Arrays.asList(0, 1, 2, 3, 4)));
     }
 }
