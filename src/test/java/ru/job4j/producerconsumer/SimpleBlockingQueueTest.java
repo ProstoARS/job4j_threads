@@ -1,13 +1,12 @@
 package ru.job4j.producerconsumer;
 
-import org.junit.Test;
-
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class SimpleBlockingQueueTest {
 
@@ -30,7 +29,6 @@ public class SimpleBlockingQueueTest {
                         try {
                             buffer.add(sbq.poll());
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
                             Thread.currentThread().interrupt();
                         }
                     }
@@ -45,6 +43,6 @@ public class SimpleBlockingQueueTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        assertThat(buffer, is(Arrays.asList(0, 1, 2, 3, 4)));
+        assertThat(buffer).containsAll(List.of(0, 1, 2, 3, 4));
     }
 }

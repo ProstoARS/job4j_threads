@@ -11,7 +11,6 @@ public class CASCount {
         int expected;
         do {
             expected = get();
-            System.out.println(count.get());
         } while (!count.compareAndSet(expected, expected + 1));
     }
 
