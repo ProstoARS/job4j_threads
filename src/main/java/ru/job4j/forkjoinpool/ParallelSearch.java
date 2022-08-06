@@ -25,7 +25,7 @@ public class ParallelSearch<T> extends RecursiveTask<Integer> {
 
     @Override
     protected Integer compute() {
-        if (array.length <= MIN_ARRAY_LENGTH) {
+        if (to - from <= MIN_ARRAY_LENGTH) {
            return search();
         }
         int mid = (to + from) / 2;
@@ -37,20 +37,11 @@ public class ParallelSearch<T> extends RecursiveTask<Integer> {
     }
 
     private int search() {
-        for (int i = 0; i < array.length; i++) {
+        for (int i = from; i <= to; i++) {
             if (array[i].equals(value)) {
                 return i;
             }
         }
         return -1;
-    }
-
-    public static void main(String[] args) {
-        Integer[] array = new Integer[20];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = i + 10;
-        }
-        Integer index = ParallelSearch.findIndex(array, 25);
-        System.out.println(index);
     }
 }
