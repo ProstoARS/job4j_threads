@@ -15,4 +15,24 @@ class ParallelSearchTest {
         Integer result = ParallelSearch.findIndex(array, 105);
         assertThat(result).isEqualTo(95);
     }
+
+    @Test
+    public void whenSearchLastElement() {
+        String[] array = new String[3];
+        array[0] = "ars";
+        array[1] = "pablo";
+        array[2] = "vova";
+        Integer result = ParallelSearch.findIndex(array, "vova");
+        assertThat(result).isEqualTo(2);
+    }
+
+    @Test
+    public void whenNoElement() {
+        String[] array = new String[3];
+        array[0] = "ars";
+        array[1] = "pablo";
+        array[2] = "vova";
+        Integer result = ParallelSearch.findIndex(array, "dimentiy");
+        assertThat(result).isEqualTo(-1);
+    }
 }
