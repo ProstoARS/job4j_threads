@@ -1,5 +1,7 @@
 package ru.job4j.pooh;
 
+import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -16,16 +18,18 @@ public class TopicService implements Service {
         String status = "200 OK";
         String text = "";
         if ("POST".equals(type)) {
-            if (topics.containsKey(sourceName)) {
-                topics.get(sourceName).forEach((a, b) -> b.add(param));
-            } else {
-                throw new IllegalArgumentException();
+            ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>
+                    topic = topics.get(sourceName);
+            if (topic != null) {
+                for (ConcurrentLinkedQueue<String> queue : topic.values()) {
+                    queue.add(param);
+                }
             }
         } else if ("GET".equals(type)) {
             topics.putIfAbsent(sourceName, new ConcurrentHashMap<>());
-            if (topics.get(sourceName).putIfAbsent(param, new ConcurrentLinkedQueue<>()) != null) {
+            topics.get(sourceName).putIfAbsent(param, new ConcurrentLinkedQueue<>(Collections.singleton("")));
                 text = topics.get(sourceName).get(param).poll();
-            } else {
+            if (Objects.equals(text, "")) {
                 status = "204";
             }
         }

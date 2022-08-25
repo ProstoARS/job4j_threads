@@ -1,5 +1,6 @@
 package ru.job4j.pooh;
 
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -14,12 +15,12 @@ public class QueueService implements Service {
         String status = "200 OK";
         String text = "";
         if ("POST".equals(type)) {
-            if (mapQueue.putIfAbsent(sourceName,
-                    new ConcurrentLinkedQueue<>()) == null) {
+            mapQueue.putIfAbsent(sourceName,
+                    new ConcurrentLinkedQueue<>());
                 mapQueue.get(sourceName).add(param);
-            }
         } else if ("GET".equals(type)) {
-            text = mapQueue.get(sourceName).poll();
+            text = mapQueue.getOrDefault(sourceName,
+                    new ConcurrentLinkedQueue<>(Collections.singleton(""))).poll();
         }
         return new Resp(text, status);
     }
