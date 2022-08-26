@@ -27,9 +27,10 @@ public class TopicService implements Service {
             }
         } else if ("GET".equals(type)) {
             topics.putIfAbsent(sourceName, new ConcurrentHashMap<>());
-            topics.get(sourceName).putIfAbsent(param, new ConcurrentLinkedQueue<>(Collections.singleton("")));
+            topics.get(sourceName).putIfAbsent(param, new ConcurrentLinkedQueue<>());
                 text = topics.get(sourceName).get(param).poll();
-            if (Objects.equals(text, "")) {
+            if (text == null) {
+                text = "";
                 status = "204";
             }
         }

@@ -30,4 +30,24 @@ public class QueueServiceTest {
         );
         assertThat(result.text()).isEqualTo("");
     }
+
+    @Test
+    public void whenQueueServiceTestingGetTwice() {
+        QueueService queueService = new QueueService();
+        String weatherSourceName = "weather";
+        String paramForWeatherSourceName = "temperature=18";
+
+        queueService.process(
+                new Req("POST", "queue", weatherSourceName, paramForWeatherSourceName)
+        );
+        Resp resultFromWeatherSource1 = queueService.process(
+                new Req("GET", "queue", weatherSourceName, null)
+        );
+        Resp resultFromWeatherSource2 = queueService.process(
+                new Req("GET", "queue", weatherSourceName, null)
+        );
+
+        assertThat(resultFromWeatherSource1.text()).isEqualTo("temperature=18");
+        assertThat(resultFromWeatherSource2.text()).isEqualTo("");
+    }
 }
