@@ -19,8 +19,11 @@ public class QueueService implements Service {
                     new ConcurrentLinkedQueue<>());
                 mapQueue.get(sourceName).add(param);
         } else if ("GET".equals(type)) {
-            text = mapQueue.getOrDefault(sourceName,
-                    new ConcurrentLinkedQueue<>(Collections.singleton(""))).poll();
+            text = mapQueue.getOrDefault(sourceName, new ConcurrentLinkedQueue<>()).poll();
+            if (text == null) {
+                text = "";
+                status = "204";
+            }
         }
         return new Resp(text, status);
     }
