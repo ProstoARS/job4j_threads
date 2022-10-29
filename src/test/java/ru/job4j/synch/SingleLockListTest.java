@@ -1,13 +1,11 @@
 package ru.job4j.synch;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
 
 public class SingleLockListTest {
 
@@ -22,6 +20,6 @@ public class SingleLockListTest {
         second.join();
         Set<Integer> rsl = new TreeSet<>();
         list.iterator().forEachRemaining(rsl::add);
-        assertThat(rsl, is(Set.of(1, 2)));
+        assertThat(rsl).containsAll(Set.of(1, 2));
     }
 }
